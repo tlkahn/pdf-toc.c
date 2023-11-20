@@ -1,0 +1,6 @@
+**/*.trash.*
+TAGS
+.idea
+**/*.o
+pdf-toc
+pdftoc
