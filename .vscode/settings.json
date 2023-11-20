@@ -1,9 +1,0 @@
-{
-  "files.associations": {
-    "*.toml": "toml",
-    "*.erb": "html",
-    "*.py": "python",
-    "*.json": "jsonc",
-    "fitz.h": "c"
-  }
-}

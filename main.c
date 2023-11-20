@@ -1,8 +1,8 @@
 #include <mupdf/fitz.h>
-#include <cJSON.h>
+#include <cjson/cJSON.h>
 #include <stdio.h>
 
-void extract_toc(const char *filepath)
+char *extract_toc(const char *filepath)
 {
     fz_context *ctx = fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED);
     fz_register_document_handlers(ctx);
@@ -31,9 +31,13 @@ void extract_toc(const char *filepath)
     fz_catch(ctx)
     {
         fprintf(stderr, "Cannot open document: %s\n", filepath);
+        cJSON_Delete(toc_array);
         fz_drop_context(ctx);
-        return;
+        return NULL;
     }
+    json_string = cJSON_PrintUnformatted(toc_array);
+    cJSON_Delete(toc_array);
+    return json_string;
 }
 
 int main(int argc, char *argv[])
@@ -49,7 +53,7 @@ int main(int argc, char *argv[])
     if (file)
     {
         fclose(file);
-        extract_toc(filepath);
+        printf("%s\n", extract_toc(filepath));
     }
     else
     {
