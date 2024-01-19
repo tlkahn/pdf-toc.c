@@ -55,20 +55,62 @@ char *extract_toc(const char *filepath)
     return json_string;
 }
 
+void write_item(cJSON *item, int level, FILE *file)
+{
+    for (int i = 0; i < level; ++i) fprintf(file, "*");
+    fprintf(file, " %s\n", cJSON_GetObjectItem(item, "title")->valuestring);
+    fprintf(file, "Page: %d\n\n", cJSON_GetObjectItem(item, "page")->valueint);
+
+    cJSON *subitems = cJSON_GetObjectItem(item, "subitem");
+    if (subitems != NULL)
+    {
+        cJSON *subitem = NULL;
+        cJSON_ArrayForEach(subitem, subitems)
+        {
+            write_item(subitem, level + 1, file);
+        }
+    }
+}
+
+void write_toc_to_markdown(const char *json_string, const char *output_file_path)
+{
+    cJSON *toc_array = cJSON_Parse(json_string);
+    if (toc_array == NULL) return;
+
+    FILE *output_file = fopen(output_file_path, "w");
+    if (output_file == NULL) return;
+
+    cJSON *item = NULL;
+    cJSON_ArrayForEach(item, toc_array)
+    {
+        write_item(item, 2, output_file);
+    }
+
+    cJSON_Delete(toc_array);
+    fclose(output_file);
+}
+
+
 int main(int argc, char *argv[])
 {
-    if (argc != 2)
+    if (argc != 3)
     {
         fprintf(stderr, "Usage: %s <filepath>\n", argv[0]);
         return 1;
     }
 
     const char *filepath = argv[1];
+    const char *output_file_path = argv[2];
+
     FILE *file = fopen(filepath, "r");
     if (file)
     {
         fclose(file);
-        printf("%s\n", extract_toc(filepath));
+        char *json_string = extract_toc(filepath);
+        if (json_string != NULL) {
+          write_toc_to_markdown(json_string, output_file_path);
+          free(json_string);
+        }
     }
     else
     {

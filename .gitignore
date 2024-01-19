@@ -5,3 +5,6 @@ TAGS
 pdf-toc
 pdftoc
 .vscode
+build
+TAGS
+.cache
