@@ -59,7 +59,9 @@ void write_item(cJSON *item, int level, FILE *file)
 {
     for (int i = 0; i < level; ++i) fprintf(file, "*");
     fprintf(file, " %s\n", cJSON_GetObjectItem(item, "title")->valuestring);
-    fprintf(file, "Page: %d\n\n", cJSON_GetObjectItem(item, "page")->valueint);
+    fprintf(file, ":PROPERTIES:\n");
+    fprintf(file, ":Page: %d\n", cJSON_GetObjectItem(item, "page")->valueint);
+    fprintf(file, ":END:\n");
 
     cJSON *subitems = cJSON_GetObjectItem(item, "subitem");
     if (subitems != NULL)
